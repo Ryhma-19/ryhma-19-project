@@ -17,6 +17,8 @@ import RoutesScreen from '../screens/routes/RoutesScreen';
 import RoutePlanningScreen from '../screens/routes/RoutePlanningScreen';
 import TrackingScreen from '../screens/tracking/TrackingScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
+import StepsScreen  from  '../screens/steps/StepsScreen';
+
 import UserSettingsScreen from '../screens/profile/UserSettingsScreen';
 import PasswordUpdateScreen from '../screens/profile/PasswordUpdateScreen';
 import { ProfileStackParamList } from '../types';
@@ -111,6 +113,8 @@ function MainNavigator() {
             iconName = focused ? 'map' : 'map-outline';
           } else if (route.name === 'Track') {
             iconName = focused ? 'play-circle' : 'play-circle-outline';
+          } else if (route.name === 'Steps') {
+            iconName = focused ? 'walk' : 'walk-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
           } else {
@@ -148,6 +152,7 @@ function MainNavigator() {
           title: 'Home',
         }}
       />
+
       <Tab.Screen
         name="Routes"
         component={RoutesNavigator}
@@ -156,6 +161,7 @@ function MainNavigator() {
           title: 'Routes',
         }}
       />
+
       <Tab.Screen
         name="Track"
         component={TrackingScreen}
@@ -163,6 +169,15 @@ function MainNavigator() {
           title: 'Track',
         }}
       />
+
+      <Tab.Screen
+        name="Steps"
+        component={StepsScreen}
+        options={{
+          title: 'Steps',
+        }}
+      />
+
       <Tab.Screen
         name="Profile"
         component={ProfileNavigator}
@@ -171,6 +186,7 @@ function MainNavigator() {
         }}
       />
     </Tab.Navigator>
+    
   );
 }
 
