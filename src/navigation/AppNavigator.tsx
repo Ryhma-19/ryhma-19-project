@@ -19,7 +19,12 @@ import TrackingScreen from '../screens/tracking/TrackingScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import StepsScreen  from  '../screens/steps/StepsScreen';
 
+import UserSettingsScreen from '../screens/profile/UserSettingsScreen';
+import PasswordUpdateScreen from '../screens/profile/PasswordUpdateScreen';
+import { ProfileStackParamList } from '../types';
+
 const Tab = createBottomTabNavigator<MainTabParamList>();
+const ProfileStack = createNativeStackNavigator<ProfileStackParamList>();
 const AuthStack = createNativeStackNavigator<AuthStackParamList>();
 const RoutesStack = createNativeStackNavigator<RoutesStackParamList>();
 
@@ -72,6 +77,28 @@ function AuthNavigator() {
   );
 }
 
+function ProfileNavigator() {
+  return (
+    <ProfileStack.Navigator>
+      <ProfileStack.Screen
+        name="ProfileMain"
+        component={ProfileScreen}
+        options={{ headerShown: false }}
+      />
+      <ProfileStack.Screen
+        name="UserSettings"
+        component={UserSettingsScreen}
+        options={{ title: 'Settings' }}
+      />
+      <ProfileStack.Screen
+        name="PasswordUpdate"
+        component={PasswordUpdateScreen}
+        options={{ title: 'Change Password' }}
+      />
+    </ProfileStack.Navigator>
+  );
+}
+
 // Main Tab Navigator
 function MainNavigator() {
   return (
@@ -118,12 +145,48 @@ function MainNavigator() {
         },
       })}
     >
-      <Tab.Screen name="Home" component={HomeScreen} />
-      <Tab.Screen name="Routes" component={RoutesScreen} />
-      <Tab.Screen name="Track" component={TrackingScreen} />
-      <Tab.Screen name="Steps" component={StepsScreen} />
-      <Tab.Screen name="Profile" component={ProfileScreen} />
+      <Tab.Screen
+        name="Home"
+        component={HomeScreen}
+        options={{
+          title: 'Home',
+        }}
+      />
+
+      <Tab.Screen
+        name="Routes"
+        component={RoutesNavigator}
+        options={{
+          headerShown: false,
+          title: 'Routes',
+        }}
+      />
+
+      <Tab.Screen
+        name="Track"
+        component={TrackingScreen}
+        options={{
+          title: 'Track',
+        }}
+      />
+
+      <Tab.Screen
+        name="Steps"
+        component={StepsScreen}
+        options={{
+          title: 'Steps',
+        }}
+      />
+
+      <Tab.Screen
+        name="Profile"
+        component={ProfileNavigator}
+        options={{
+          title: 'Profile',
+        }}
+      />
     </Tab.Navigator>
+    
   );
 }
 

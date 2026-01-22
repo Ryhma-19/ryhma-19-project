@@ -94,6 +94,7 @@ export type MainTabParamList = {
   Track: undefined;
   Steps: undefined;
   Profile: undefined;
+  Settings: undefined;
 };
 
 export type AuthStackParamList = {
@@ -109,18 +110,18 @@ export interface DailySteps {
 }
 
 export interface StepsGoal {
-  dailyGoal: number; // steps per day
+  dailyGoal: number; 
   lastUpdated: Date;
 }
 
 export interface WeeklyStepsData {
-  week: string; // 'YYYY-Www' format
+  week: string; 
   days: DailySteps[];
   total: number;
 }
 
 export interface MonthlyStepsData {
-  month: string; // 'YYYY-MM' format
+  month: string; 
   weeks: WeeklyStepsData[];
   total: number;
 }
