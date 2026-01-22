@@ -20,6 +20,7 @@ export type MainTabParamList = {
   Home: undefined;
   Routes: undefined;
   Track: undefined;
+  Steps: undefined;
   Profile: undefined;
 };
 
