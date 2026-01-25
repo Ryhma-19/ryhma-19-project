@@ -18,6 +18,7 @@ import RoutePlanningScreen from '../screens/routes/RoutePlanningScreen';
 import TrackingScreen from '../screens/tracking/TrackingScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import StepsScreen  from  '../screens/steps/StepsScreen';
+import BadgeScreen from '../screens/profile/BadgesScreen';
 
 import UserSettingsScreen from '../screens/profile/UserSettingsScreen';
 import PasswordUpdateScreen from '../screens/profile/PasswordUpdateScreen';
@@ -94,6 +95,11 @@ function ProfileNavigator() {
         name="PasswordUpdate"
         component={PasswordUpdateScreen}
         options={{ title: 'Change Password' }}
+      />
+      <ProfileStack.Screen
+        name="UserBadges"
+        component={BadgeScreen}
+        options={{ headerShown: true, title: "" }}
       />
     </ProfileStack.Navigator>
   );

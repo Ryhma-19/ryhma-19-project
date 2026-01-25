@@ -60,12 +60,22 @@ export interface WeatherCondition {
   isExtreme?: boolean; // For warnings
 }
 
+export const ICONS = {
+  calendar: "📅",
+  bicycle: "🚴",
+  stopwatch: "⏱️",
+  biceps: "💪",
+  trophy: "🏆",
+  run: "🏃"
+} as const;
+
+export type IconKey = keyof typeof ICONS;
+
 export interface Achievement {
   id: string;
   type: 'distance' | 'streak' | 'speed' | 'custom';
   title: string;
-  description: string;
-  icon: string;
+  icon: IconKey;
   target: number;
   progress: number;
   isUnlocked: boolean;
@@ -101,6 +111,7 @@ export type ProfileStackParamList = {
   ProfileMain: undefined;
   UserSettings: undefined;
   PasswordUpdate: undefined;
+  UserBadges: undefined;
 };
 
 export type AuthStackParamList = {

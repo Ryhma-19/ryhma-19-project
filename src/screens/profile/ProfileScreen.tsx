@@ -1,5 +1,5 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Pressable } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Pressable, Button } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -10,9 +10,15 @@ export default function ProfileScreen({navigation}: any) {
 
   return (
     <View style={styles.container}>
-      <Pressable style={styles.settingsButton} onPress={() => navigation.navigate('UserSettings')}>
-        <Ionicons name="settings-sharp" size={32}/>
-      </Pressable>
+      <View style={styles.topRightCorner}>
+        <Button 
+          title='Badges'
+          onPress={() => navigation.navigate('UserBadges')}
+        />
+        <Pressable onPress={() => navigation.navigate('UserSettings')}>
+          <Ionicons name="settings-sharp" size={32}/>
+        </Pressable>
+      </View>
       
       <Text style={styles.title}>Profile</Text>
       <Text style={styles.subtitle}>{user?.displayName}</Text>
@@ -60,7 +66,7 @@ const styles = StyleSheet.create({
     fontSize: TYPOGRAPHY.sizes.md,
     fontWeight: TYPOGRAPHY.weights.semibold,
   },
-  settingsButton: {
+  topRightCorner: {
     alignSelf: 'flex-end',
     position: 'absolute',
     right: 20,
