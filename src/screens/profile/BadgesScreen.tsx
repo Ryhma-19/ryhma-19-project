@@ -120,7 +120,7 @@ export default function BadgeScreen() {
 
       <FlatList
         data={sortedBadges}
-        numColumns={2}
+        numColumns={3}
         keyExtractor={item => item.id}
         renderItem={({ item }) => <BadgeCard badge={item} />}
         columnWrapperStyle={{ gap: 12 }}
