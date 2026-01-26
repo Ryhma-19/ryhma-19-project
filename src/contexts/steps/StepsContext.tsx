@@ -37,6 +37,7 @@ export const StepsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
   const { user } = useAuth();
   const goalNotificationSentRef = useRef(false); // Track if notification already sent today
   const pedometerBaseRef = useRef<number | null>(null); // Track base count from device when app starts
+  const lastSessionStepsRef = useRef<number>(0); // Track last pedometer session reading to calculate delta
 
   // Request notification permissions on app startup
   useEffect(() => {
@@ -145,15 +146,22 @@ export const StepsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     }
 
     // Watch pedometer for new steps
-    // Only update if new count is higher than saved (prevents initial "1" from overwriting)
+    // Accumulate new steps on top of saved steps using session delta
     subscription = Pedometer.watchStepCount(result => {
       console.log("Pedometer event fired. Session steps:", result.steps);
       
-      // Ignore low pedometer readings that would overwrite saved data
-      if (savedSteps === 0 || result.steps > savedSteps) {
-        setSteps(result.steps);
-      } else {
-        console.log("Ignoring low pedometer count (", result.steps, ") - keeping saved:", savedSteps);
+      // Calculate delta (new steps since last reading)
+      const delta = result.steps - lastSessionStepsRef.current;
+      lastSessionStepsRef.current = result.steps;
+      
+      // Only add positive deltas (prevents negative deltas from being added)
+      if (delta > 0) {
+        const newTotal = savedSteps + delta;
+        console.log("Delta:", delta, "| New total:", newTotal, "(saved:", savedSteps, "+ delta:", delta + ")");
+        setSteps(newTotal);
+        savedSteps = newTotal; // Update reference for next delta calculation
+      } else if (delta < 0) {
+        console.log("Ignoring negative delta (", delta, ") - device counter likely reset");
       }
     });
   } else {
@@ -168,6 +176,7 @@ export const StepsProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     return () => {
       subscription && subscription.remove();
       pedometerBaseRef.current = null;
+      lastSessionStepsRef.current = 0; // Reset session counter for next init
     };
   }, [user]);
 
