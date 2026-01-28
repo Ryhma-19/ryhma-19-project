@@ -2,9 +2,12 @@ import { doc, setDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { Achievement } from "../../types";
 
+/*
 export class badgeManager {
     static async initializeUserBadges(userId: string) {
-        const batch = BADGE_DEFINITIONS.map(async (badge) => {
+
+
+        const batch = ALL_USER_BADGES.map(async (badge) => {
             const badgeRef = doc(db, "users", userId, "badges", badge.id);
             return setDoc(badgeRef, {
                 ...badge,
@@ -27,7 +30,7 @@ export class badgeManager {
     }
 
     static async getUserBadges(userId: string): Promise<Achievement[]> {
-        const badgesSnap = await getDocs(collection(db, "users", userId, "badges"));
+        const badgesSnap = await getDocs(collection(db, "badges", userId, "badges"));
         return badgesSnap.docs.map(doc => {
             const data = doc.data();
             return {
@@ -52,3 +55,4 @@ export class badgeManager {
 
 }
 
+*/

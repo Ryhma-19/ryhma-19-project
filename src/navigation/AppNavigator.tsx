@@ -18,7 +18,7 @@ import RoutePlanningScreen from '../screens/routes/RoutePlanningScreen';
 import TrackingScreen from '../screens/tracking/TrackingScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import StepsScreen  from  '../screens/steps/StepsScreen';
-import BadgeScreen from '../screens/profile/BadgesScreen';
+import BadgeScreen from '../screens/profile/badges/BadgesScreen';
 
 import UserSettingsScreen from '../screens/profile/UserSettingsScreen';
 import PasswordUpdateScreen from '../screens/profile/PasswordUpdateScreen';

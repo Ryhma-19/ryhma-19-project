@@ -11,6 +11,7 @@ export default function UserSettingsScreen({ navigation }: any) {
   const [displayName, setDisplayName] = useState(user?.displayName ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [loading, setLoading] = useState(false);
+  const [weight, setWeight] = useState('');
 
   const handleSave = async () => {
     setLoading(true)
@@ -55,6 +56,7 @@ export default function UserSettingsScreen({ navigation }: any) {
         onChangeText={setDisplayName}
         style={styles.input}
       />
+
       <Text style={styles.subtitle}>Change email address</Text>
       <TextInput
         placeholder="Email address"
@@ -64,6 +66,16 @@ export default function UserSettingsScreen({ navigation }: any) {
         autoCapitalize="none"
         keyboardType="email-address"
       />
+
+      <Text style={styles.subtitle}>Change your weight</Text>
+      <TextInput
+        placeholder="weight"
+        value={weight}
+        onChangeText={setWeight}
+        style={styles.input}
+        keyboardType='decimal-pad'
+      />
+
       <TouchableOpacity
         style={styles.passwordButton}
         onPress={() => navigation.navigate("PasswordUpdate")}
@@ -72,6 +84,7 @@ export default function UserSettingsScreen({ navigation }: any) {
             Change password
         </Text>
       </TouchableOpacity>
+
       <Text style={styles.subtitle}>Turn on notifications?</Text>
       <Switch
         value={notifications}
