@@ -81,7 +81,16 @@ export interface Achievement {
   isUnlocked: boolean;
   unlockedAt?: Date;
 }
-
+/*
+export interface Achievement {
+  workoutId: string,
+  achievementType: 'personal_record' | 'milestone' | 'streak',
+  metric: 'distance' | 'pace' | 'steps' | 'duration',
+  value: number,
+  previousBest?: number,
+  timestamp: Date
+}
+*/
 export interface WorkoutStats {
   totalWorkouts: number;
   totalDistance: number; // meters

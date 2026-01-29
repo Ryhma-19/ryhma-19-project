@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, Switch, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, Switch, Alert, ScrollView } from 'react-native';
 import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
 import { updateProfile } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../services/firebase/config';
+import { useAuth } from '../../contexts/AuthContext';
 
 export default function UserSettingsScreen({ navigation }: any) {
+  const { signOut } = useAuth()
   const user = auth.currentUser;
   const [notifications, setNotifactions] = useState(false);
   const [displayName, setDisplayName] = useState(user?.displayName ?? '');
@@ -48,70 +50,80 @@ export default function UserSettingsScreen({ navigation }: any) {
   }
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.subtitle}>Change display name</Text>
-      <TextInput
-        placeholder="Display name"
-        value={displayName}
-        onChangeText={setDisplayName}
-        style={styles.input}
-      />
+    <ScrollView
+    contentContainerStyle={styles.container}
+    keyboardShouldPersistTaps="handled"
+    showsVerticalScrollIndicator={false}
+    >
+      
+        <Text style={styles.subtitle}>Change display name</Text>
+        <TextInput
+          placeholder="Display name"
+          value={displayName}
+          onChangeText={setDisplayName}
+          style={styles.input}
+        />
 
-      <Text style={styles.subtitle}>Change email address</Text>
-      <TextInput
-        placeholder="Email address"
-        value={email}
-        onChangeText={setEmail}
-        style={styles.input}
-        autoCapitalize="none"
-        keyboardType="email-address"
-      />
+        <Text style={styles.subtitle}>Change email address</Text>
+        <TextInput
+          placeholder="Email address"
+          value={email}
+          onChangeText={setEmail}
+          style={styles.input}
+          autoCapitalize="none"
+          keyboardType="email-address"
+        />
 
-      <Text style={styles.subtitle}>Change your weight</Text>
-      <TextInput
-        placeholder="weight"
-        value={weight}
-        onChangeText={setWeight}
-        style={styles.input}
-        keyboardType='decimal-pad'
-      />
+        <Text style={styles.subtitle}>Change your weight</Text>
+        <TextInput
+          placeholder="weight"
+          value={weight}
+          onChangeText={setWeight}
+          style={styles.input}
+          keyboardType='decimal-pad'
+        />
 
-      <TouchableOpacity
-        style={styles.passwordButton}
-        onPress={() => navigation.navigate("PasswordUpdate")}
-        >
-        <Text style={styles.subtitle}>
-            Change password
-        </Text>
-      </TouchableOpacity>
+        <TouchableOpacity
+          style={styles.passwordButton}
+          onPress={() => navigation.navigate("PasswordUpdate")}
+          >
+          <Text style={styles.subtitle}>
+              Change password
+          </Text>
+        </TouchableOpacity>
 
-      <Text style={styles.subtitle}>Turn on notifications?</Text>
-      <Switch
-        value={notifications}
-        onValueChange={setNotifactions}
-      />
+        <Text style={styles.subtitle}>Turn on notifications?</Text>
+        <Switch
+          value={notifications}
+          onValueChange={setNotifactions}
+        />
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleSave}
-        disabled={loading}
-        >
-        <Text style={styles.buttonText}>
-            {loading ? 'Saving...' : 'Save'}
-        </Text>
-      </TouchableOpacity>
-    </View>
+        <TouchableOpacity
+          style={styles.button}
+          onPress={handleSave}
+          disabled={loading}
+          >
+          <Text style={styles.buttonText}>
+              {loading ? 'Saving...' : 'Save'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.signOutButton} onPress={signOut}>
+          <Text style={styles.buttonText}>Sign Out</Text>
+        </TouchableOpacity>
+      
+    </ScrollView>
   );
 }
 
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: COLORS.background,
     padding: SPACING.lg,
+    paddingBottom: 40,
   },
   subtitle: {
     fontSize: TYPOGRAPHY.sizes.lg,
@@ -133,7 +145,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     padding: SPACING.md,
     alignItems: 'center',
-    marginTop: SPACING.md,
+    marginTop: SPACING.sm,
   },
   buttonText: {
     color: '#FFFFFF',
@@ -142,8 +154,14 @@ const styles = StyleSheet.create({
   },
   passwordButton: {
     borderRadius: 8,
+    padding: SPACING.sm,
+    alignItems: 'center',
+  },
+  signOutButton: {
+    backgroundColor: COLORS.error,
+    borderRadius: 8,
     padding: SPACING.md,
     alignItems: 'center',
-    marginTop: SPACING.md,
+    marginTop: 40,
   },
 });

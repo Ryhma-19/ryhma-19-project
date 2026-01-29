@@ -5,10 +5,20 @@ import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import BadgeCard from './badges/BadgeCard';
 import { Achievement } from '../../types';
-import ProfileBadgeCard from './ProfileBadgeCard';
 
 const date = new Date("23-1-2026")
-
+/*
+const UserBadgeTestData: Achievement[] = [
+  {
+    workoutId: "100_workouts",
+    achievementType: "milestone",
+    metric: "pace",
+    value: 100,
+    previousBest: 90,
+    timestamp: date,
+  },
+]
+*/
 const UserBadgeTestData: Achievement[] = [
   {
         id: "100_workouts",
@@ -44,7 +54,7 @@ const UserBadgeTestData: Achievement[] = [
 
 
 export default function ProfileScreen({navigation}: any) {
-  const { user, signOut } = useAuth();
+  const { user } = useAuth();
 
 
 
@@ -65,19 +75,14 @@ export default function ProfileScreen({navigation}: any) {
       </View>
 
       <View style={styles.ProfileContainer}>
-        <Text style={styles.title}>Profile</Text>
-        <Text style={styles.subtitle}>{user?.displayName}</Text>
+        <Text style={styles.title}>{user?.displayName} 🎖️</Text>
         <Text style={styles.email}>{user?.email}</Text>
         <FlatList
           data={UserBadgeTestData}
           numColumns={3}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => <ProfileBadgeCard badge={item} />}
+          renderItem={({ item }) => <BadgeCard badge={item} />}
         />
-
-        <TouchableOpacity style={styles.button} onPress={signOut}>
-          <Text style={styles.buttonText}>Sign Out</Text>
-        </TouchableOpacity>
       </View>
     </View>
   );
