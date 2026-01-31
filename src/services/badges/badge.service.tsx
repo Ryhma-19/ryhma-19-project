@@ -2,24 +2,42 @@ import { doc, setDoc, getDocs, collection } from "firebase/firestore";
 import { db } from "../firebase/config";
 import { Achievement } from "../../types";
 
-/*
-export class badgeManager {
-    static async initializeUserBadges(userId: string) {
 
+export class BadgeManager {
+  static async getAllBadgesWithUnlockStatus(userId: string): Promise<Achievement[]> {
+    try {
+      const allBadgesSnap = await getDocs(collection(db, "badges"))
 
-        const batch = ALL_USER_BADGES.map(async (badge) => {
-            const badgeRef = doc(db, "users", userId, "badges", badge.id);
-            return setDoc(badgeRef, {
-                ...badge,
-                progress: 0,
-                isUnlocked: false,
-                unlockedAt: null,
-            });
-        });
+      const unlockedSnap = await getDocs(
+        collection(db, "users", userId, "badges")
+      )
+      
+      const unlockedIds = new Set(unlockedSnap.docs.map(doc => doc.id))
 
-        await Promise.all(batch);
+      const progress = 10
+
+      return allBadgesSnap.docs.map(doc => {
+        const data = doc.data()
+
+        return {
+          id: doc.id,
+          ...(data as Omit<Achievement, "id" | "progress" | "isUnlocked" | "unlockedAt">),
+          progress,
+          isUnlocked: unlockedIds.has(doc.id),
+          unlockedAt: unlockedIds.has(doc.id)
+            ? unlockedSnap.docs.find(d => d.id === doc.id)?.data()?.unlockedAt?.toDate()
+            : undefined
+        }
+      })
+
+    } catch (error) {
+      console.error("Error", error)
+      throw error
     }
+  }
+}
 
+/*
     static async saveUserBadge(userId: string, badge: Achievement) {
         const badgeRef = doc(collection(db, "users", userId, "badges"), badge.id);
 

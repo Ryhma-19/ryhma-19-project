@@ -6,98 +6,26 @@ import { db } from "../../../services/firebase/config"
 import { Achievement, ICONS } from "../../../types"
 import { useAuth } from "../../../contexts/AuthContext"
 import BadgeCard from "./BadgeCard"
-
-const date = new Date("23-1-2026")
-
-const BadgeTestData: Achievement[] = [
-    {
-        id: "10_workouts",
-        type: 'streak',
-        title: "Complete 10 workouts",
-        icon: "biceps",
-        target: 10,
-        progress: 7,
-        isUnlocked: false,
-        unlockedAt: date,
-    },
-    {
-        id: "10km_total",
-        type: 'distance',
-        title: "Run for 10km in total",
-        icon: "run",
-        target: 10,
-        progress: 10,
-        isUnlocked: true,
-        unlockedAt: date,
-    },
-    {
-        id: "20km_total",
-        type: 'distance',
-        title: "Run for 20km in total",
-        icon: "run",
-        target: 20,
-        progress: 15,
-        isUnlocked: false,
-        unlockedAt: date,
-    },
-    {
-        id: "30km_total",
-        type: 'distance',
-        title: "Run for 30km in total",
-        icon: "run",
-        target: 30,
-        progress: 15,
-        isUnlocked: false,
-        unlockedAt: date,
-    },
-    {
-        id: "log_in_1_week",
-        type: 'streak',
-        title: "Log in everyday for 1 week",
-        icon: "calendar",
-        target: 7,
-        progress: 7,
-        isUnlocked: true,
-        unlockedAt: date,
-    },
-    {
-        id: "log_in_1_month",
-        type: 'streak',
-        title: "Log in everyday for 1 month",
-        icon: "calendar",
-        target: 31,
-        progress: 7,
-        isUnlocked: false,
-        unlockedAt: date,
-    }
-]
+import { BadgeManager } from "../../../services/badges/badge.service"
 
 
 export default function BadgeScreen() {
   const { user } = useAuth()
-  const USER_ID = user?.id
-  const [badges, setBadges] = useState<Achievement[]>(BadgeTestData)
-  const [loading, setLoading] = useState(false)
+  const [badges, setBadges] = useState<Achievement[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
-    /*
-    if (!USER_ID) {
+    const loadBadges = async () => {
+      if (!user?.id) {
+        setLoading(false)
         return
-    }
-    const ref = collection(db, "users", USER_ID, "badges")
-
-    const unsub = onSnapshot(ref, snapshot => {
-      const data = snapshot.docs.map(doc => ({
-        id: doc.id,
-        ...doc.data(),
-      })) as Achievement[]
-
+      }
+      const data = await BadgeManager.getAllBadgesWithUnlockStatus(user?.id)
       setBadges(data)
       setLoading(false)
-    })
+    }
 
-    return () => unsub()
-    */
+    loadBadges()
   }, [])
 
   const sortedBadges = useMemo(() => {
@@ -106,7 +34,9 @@ export default function BadgeScreen() {
         return a.isUnlocked ? -1 : 1;
       }
 
-      return (b.progress / b.target) - (a.progress / a.target);
+      return 0
+
+      //return (b.progress / b.target) - (a.progress / a.target);
     });
   }, [badges]);
 

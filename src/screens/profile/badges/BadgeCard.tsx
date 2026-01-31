@@ -4,7 +4,8 @@ import { Achievement, ICONS } from "../../../types"
 
 export default function BadgeCard({ badge }: { badge: Achievement }) {
   const [modalVisible, setModalVisible] = useState(false);
-  const progressPercent = Math.min((badge.progress / badge.target) * 100, 100)
+  // const progressPercent = Math.min((badge.progress / badge.target) * 100, 100)
+  const progressPercent = 100
 
   return (
     <View>
@@ -20,7 +21,7 @@ export default function BadgeCard({ badge }: { badge: Achievement }) {
           onPress={() => setModalVisible(false)}
         >
           <View style={[styles.modalScreen, !badge.isUnlocked && styles.locked]}>
-            <Text style={styles.modalIcon}>{ICONS[badge.icon] ?? ''}</Text>
+            <Text style={styles.modalIcon}>{ICONS[badge.type] ?? ''}</Text>
           </View>
           <Text style={styles.modalText}>{badge.title}</Text>
           {!badge.isUnlocked && (
@@ -41,7 +42,7 @@ export default function BadgeCard({ badge }: { badge: Achievement }) {
       >
         <View style={[styles.card, !badge.isUnlocked && styles.locked]}>
           <View style={styles.background}>
-            <Text style={styles.icon}>{ICONS[badge.icon] ?? ''}</Text>
+            <Text style={styles.icon}>{ICONS[badge.type] ?? ''}</Text>
           </View>
 
           <Text style={styles.badgeTitle}>{badge.title}</Text>

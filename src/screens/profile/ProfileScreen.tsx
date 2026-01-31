@@ -1,63 +1,32 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, Pressable, FlatList } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import BadgeCard from './badges/BadgeCard';
 import { Achievement } from '../../types';
-
-const date = new Date("23-1-2026")
-/*
-const UserBadgeTestData: Achievement[] = [
-  {
-    workoutId: "100_workouts",
-    achievementType: "milestone",
-    metric: "pace",
-    value: 100,
-    previousBest: 90,
-    timestamp: date,
-  },
-]
-*/
-const UserBadgeTestData: Achievement[] = [
-  {
-        id: "100_workouts",
-        type: 'streak',
-        title: "Completed 100 workouts",
-        icon: "biceps",
-        target: 100,
-        progress: 100,
-        isUnlocked: true,
-        unlockedAt: date,
-    },
-    {
-        id: "100km_total",
-        type: 'distance',
-        title: "Ran 100 km in total",
-        icon: "run",
-        target: 10,
-        progress: 10,
-        isUnlocked: true,
-        unlockedAt: date,
-    },
-    {
-        id: "user_speed",
-        type: 'streak',
-        title: "Active user for 1 year",
-        icon: "calendar",
-        target: 30,
-        progress: 30,
-        isUnlocked: true,
-        unlockedAt: date,
-    },
-]
+import { BadgeManager } from '../../services/badges/badge.service';
 
 
 export default function ProfileScreen({navigation}: any) {
   const { user } = useAuth();
+    const [badges, setBadges] = useState<Achievement[]>()
+    const [loading, setLoading] = useState(false)
+  /*
+  useEffect(() => {
+    const loadBadges = async () => {
+      if (!user?.id) {
+        setLoading(false)
+        return
+      }
+      const data = await BadgeManager.getBadgesWithUnlockStatus(user?.id)
+      setBadges(data)
+      setLoading(false)
+    }
 
-
-
+    loadBadges()
+  }, [])
+*/
   return (
     <View style={styles.container}>
       <View style={styles.topRightCorner}>
@@ -78,7 +47,7 @@ export default function ProfileScreen({navigation}: any) {
         <Text style={styles.title}>{user?.displayName} 🎖️</Text>
         <Text style={styles.email}>{user?.email}</Text>
         <FlatList
-          data={UserBadgeTestData}
+          data={badges}
           numColumns={3}
           keyExtractor={item => item.id}
           renderItem={({ item }) => <BadgeCard badge={item} />}

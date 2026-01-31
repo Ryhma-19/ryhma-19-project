@@ -61,36 +61,25 @@ export interface WeatherCondition {
 }
 
 export const ICONS = {
-  calendar: "📅",
-  bicycle: "🚴",
-  stopwatch: "⏱️",
-  biceps: "💪",
-  trophy: "🏆",
-  run: "🏃"
+  duration: "⏱️",
+  pace: "🏃",
+  distance: "🚶",
+  steps: "👟",
+  amount: "💪",
 } as const;
 
 export type IconKey = keyof typeof ICONS;
 
 export interface Achievement {
   id: string;
-  type: 'distance' | 'streak' | 'speed' | 'custom';
+  type: IconKey;
   title: string;
-  icon: IconKey;
-  target: number;
+  milestones: number[] | null;
   progress: number;
   isUnlocked: boolean;
-  unlockedAt?: Date;
+  unlockedAt: Date;
 }
-/*
-export interface Achievement {
-  workoutId: string,
-  achievementType: 'personal_record' | 'milestone' | 'streak',
-  metric: 'distance' | 'pace' | 'steps' | 'duration',
-  value: number,
-  previousBest?: number,
-  timestamp: Date
-}
-*/
+
 export interface WorkoutStats {
   totalWorkouts: number;
   totalDistance: number; // meters
