@@ -1,32 +1,36 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Pressable, FlatList } from 'react-native';
+import { View, Text, StyleSheet, Pressable, FlatList, ActivityIndicator } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import BadgeCard from './badges/BadgeCard';
 import { Achievement } from '../../types';
-import { BadgeManager } from '../../services/badges/badge.service';
+import { BadgeService } from '../../services/badges/badge.service';
 
 
 export default function ProfileScreen({navigation}: any) {
   const { user } = useAuth();
     const [badges, setBadges] = useState<Achievement[]>()
-    const [loading, setLoading] = useState(false)
-  /*
+    const [loading, setLoading] = useState(true)
+  
   useEffect(() => {
     const loadBadges = async () => {
       if (!user?.id) {
         setLoading(false)
         return
       }
-      const data = await BadgeManager.getBadgesWithUnlockStatus(user?.id)
+      const data = await BadgeService.getUserProfileBadges(user?.id)
       setBadges(data)
       setLoading(false)
     }
 
     loadBadges()
-  }, [])
-*/
+  }, [badges])
+
+  if (loading) {
+    return <ActivityIndicator style={{ marginTop: 40 }} />
+  }
+
   return (
     <View style={styles.container}>
       <View style={styles.topRightCorner}>
@@ -35,12 +39,13 @@ export default function ProfileScreen({navigation}: any) {
         style={styles.BadgesButton}
         onPress={() => navigation.navigate('UserBadges')}
         >
-          <Text style={styles.buttonText}>My Badges</Text>
+          <View>
+            <Text style={styles.buttonText}>My Badges</Text>
+          </View>
         </Pressable>
         <Pressable onPress={() => navigation.navigate('UserSettings')}>
           <Ionicons name="settings-sharp" size={32}/>
         </Pressable>
-
       </View>
 
       <View style={styles.ProfileContainer}>

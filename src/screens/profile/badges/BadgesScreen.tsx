@@ -1,12 +1,10 @@
 // screens/BadgeScreen.tsx
 import React, { useEffect, useMemo, useState } from "react"
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native"
-import { collection, onSnapshot } from "firebase/firestore"
-import { db } from "../../../services/firebase/config"
-import { Achievement, ICONS } from "../../../types"
+import { Achievement } from "../../../types"
 import { useAuth } from "../../../contexts/AuthContext"
 import BadgeCard from "./BadgeCard"
-import { BadgeManager } from "../../../services/badges/badge.service"
+import { BadgeService } from "../../../services/badges/badge.service"
 
 
 export default function BadgeScreen() {
@@ -20,13 +18,13 @@ export default function BadgeScreen() {
         setLoading(false)
         return
       }
-      const data = await BadgeManager.getAllBadgesWithUnlockStatus(user?.id)
+      const data = await BadgeService.getAllBadges(user?.id)
       setBadges(data)
       setLoading(false)
     }
 
     loadBadges()
-  }, [])
+  }, [badges])
 
   const sortedBadges = useMemo(() => {
     return [...badges].sort((a, b) => {

@@ -1,8 +1,11 @@
 import { View, Text, StyleSheet, Modal, Pressable } from "react-native"
 import { useState } from "react";
 import { Achievement, ICONS } from "../../../types"
+import { BadgeService } from "../../../services/badges/badge.service";
+import { useAuth } from "../../../contexts/AuthContext";
 
 export default function BadgeCard({ badge }: { badge: Achievement }) {
+  const { user } = useAuth()
   const [modalVisible, setModalVisible] = useState(false);
   // const progressPercent = Math.min((badge.progress / badge.target) * 100, 100)
   const progressPercent = 100
@@ -20,18 +23,43 @@ export default function BadgeCard({ badge }: { badge: Achievement }) {
           style={styles.modalOverlay}
           onPress={() => setModalVisible(false)}
         >
+
           <View style={[styles.modalScreen, !badge.isUnlocked && styles.locked]}>
             <Text style={styles.modalIcon}>{ICONS[badge.type] ?? ''}</Text>
           </View>
           <Text style={styles.modalText}>{badge.title}</Text>
+          {badge.progress && (
+            <Text style={styles.modalText}>{badge.progress?.toString()}</Text>
+          )}
           {!badge.isUnlocked && (
             <View style={styles.modalProgressBar}>
-              <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
+            <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
             </View>
           )}
-          {badge.isUnlocked && (
-            <Pressable style={styles.modalIconButton}>
-              <Text>Add to profile</Text>
+          {!badge.isUnlocked && (
+            <Pressable 
+            style={styles.modalIconButton}
+            onPress={() => BadgeService.saveBadgeToUser(user?.id, badge.id)}
+            >
+              <Text>Unlock</Text>
+            </Pressable>
+          )}
+
+          {badge.isUnlocked && !badge.isProfile && (
+            <Pressable 
+            style={styles.modalIconButton}
+            onPress={() => BadgeService.changeProfileBadgeStatus(user?.id, badge.id, true)}
+            >
+            <Text>Add to profile</Text>
+            </Pressable> 
+          )}
+
+          {badge.isUnlocked && badge.isProfile && (
+            <Pressable 
+            style={styles.modalIconButton}
+            onPress={() => BadgeService.changeProfileBadgeStatus(user?.id, badge.id, false)}
+            >
+            <Text>Remove from profile</Text>
             </Pressable>
           )}
         </Pressable>
@@ -46,6 +74,10 @@ export default function BadgeCard({ badge }: { badge: Achievement }) {
           </View>
 
           <Text style={styles.badgeTitle}>{badge.title}</Text>
+
+          {badge.progress && (
+            <Text>{badge.progress}</Text>
+          )}
 
           {!badge.isUnlocked && (
             <View style={styles.progressBar}>
@@ -65,7 +97,7 @@ const styles = StyleSheet.create({
   card: {
     width: 100,
     padding: 16,
-    borderRadius: 32, //16
+    borderRadius: 32,
     alignItems: "center",
     shadowColor: "#000",
     shadowOpacity: 0.05,
@@ -115,7 +147,7 @@ const styles = StyleSheet.create({
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)", // adjust opacity here
+    backgroundColor: "rgba(0, 0, 0, 0.6)",
     justifyContent: "center",
     alignItems: "center",
   },
@@ -144,6 +176,7 @@ const styles = StyleSheet.create({
     marginTop: 10,
   },
   modalIconButton: {
+    marginTop: 24,
     borderRadius: 8,
     padding: 24,
     alignItems: 'center',

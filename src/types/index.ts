@@ -78,6 +78,7 @@ export interface Achievement {
   progress: number;
   isUnlocked: boolean;
   unlockedAt: Date;
+  isProfile: boolean;
 }
 
 export interface WorkoutStats {
