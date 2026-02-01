@@ -19,11 +19,12 @@ import RoutePlanningScreen from '../screens/routes/RoutePlanningScreen';
 import TrackingScreen from '../screens/tracking/TrackingScreen';
 import ProfileScreen from '../screens/profile/ProfileScreen';
 import StepsScreen  from  '../screens/steps/StepsScreen';
-import BadgeScreen from '../screens/profile/badges/BadgesScreen';
+import PremiumPlanScreen from '../screens/storepage/PremiumPlanScreen';
 
 // Profile Screens
 import UserSettingsScreen from '../screens/profile/UserSettingsScreen';
 import PasswordUpdateScreen from '../screens/profile/PasswordUpdateScreen';
+import BadgeScreen from '../screens/profile/badges/BadgesScreen';
 
 // Tracking Screens
 import WorkoutSetupScreen from '../screens/tracking/WorkoutSetupScreen';
@@ -194,6 +195,8 @@ function MainNavigator() {
             iconName = focused ? 'walk' : 'walk-outline';
           } else if (route.name === 'Profile') {
             iconName = focused ? 'person' : 'person-outline';
+          } else if (route.name === 'StorePage') {
+            iconName = focused ? 'storefront' : 'storefront-outline';
           } else {
             iconName = 'help-outline';
           }
@@ -261,6 +264,14 @@ function MainNavigator() {
         component={ProfileNavigator}
         options={{
           title: 'Profile',
+        }}
+      />
+
+      <Tab.Screen
+        name="StorePage"
+        component={PremiumPlanScreen}
+        options={{
+          title: 'Store',
         }}
       />
     </Tab.Navigator>

@@ -1,7 +1,10 @@
 import { initializeApp } from 'firebase/app';
+// @ts-ignore: getReactNativePersistence exists in the RN bundle 
 import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getFirestore } from 'firebase/firestore';
+
+
 
 import {
   FIREBASE_API_KEY,
