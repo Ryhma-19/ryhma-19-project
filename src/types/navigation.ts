@@ -45,7 +45,7 @@ export type ProfileStackParamList = {
   ProfileMain: undefined;
   UserSettings: undefined;
   PasswordUpdate: undefined;
-  // Add more profile screens later
+  UserBadges: undefined;
 };
 
 // Main Tab Navigator
