@@ -13,23 +13,21 @@ const PLANS: Plan[] = [
   {
     id: "monthly",
     title: "Monthly",
-    price: "$9.99 / month",
+    price: "$7.99 / month",
   },
   {
     id: "yearly",
     title: "Yearly",
-    price: "$79.99 / year",
+    price: "$63.99 / year",
     subtitle: "Best value • Save 33%",
     highlighted: true,
   },
 ];
 
 const FEATURES = [
-  "Personalized workout plans",
-  "Unlimited exercise library",
-  "Progress & body tracking",
-  "Meal & nutrition guidance",
-  "Offline workouts",
+  "More in depth workout statistics",
+  "Save up to 100 routes",
+  "Exclusive badges",
   "No ads",
 ];
 
@@ -79,10 +77,7 @@ export default function PremiumPlanScreen() {
                   styles.planButton,
                   plan.highlighted && styles.highlightedButton,
                 ]}
-                onPress={() => {
-                  // TODO: connect to purchase flow
-                  console.log(`Selected plan: ${plan.id}`);
-                }}
+                onPress={() => {}}
               >
                 <Text
                   style={[
@@ -108,7 +103,7 @@ export default function PremiumPlanScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#0B0B0F",
+    backgroundColor: "#f3f3f3",
   },
   header: {
     padding: 24,
@@ -117,12 +112,12 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontWeight: "800",
-    color: "#FFFFFF",
+    color: "#121212",
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
-    color: "#B3B3B3",
+    color: "#9c9c9c",
     textAlign: "center",
   },
   featuresContainer: {
@@ -140,7 +135,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
   featureText: {
-    color: "#EAEAEA",
+    color: "#202020",
     fontSize: 15,
   },
   plansContainer: {
@@ -148,7 +143,7 @@ const styles = StyleSheet.create({
     marginTop: 24,
   },
   planCard: {
-    backgroundColor: "#1A1A1F",
+    backgroundColor: "#f5f5f5",
     borderRadius: 16,
     padding: 20,
     marginBottom: 16,
@@ -157,7 +152,7 @@ const styles = StyleSheet.create({
   },
   highlightedPlan: {
     borderColor: "#4CAF50",
-    backgroundColor: "#162016",
+    backgroundColor: "#ceecce",
   },
   badge: {
     alignSelf: "flex-start",
@@ -173,11 +168,11 @@ const styles = StyleSheet.create({
   planTitle: {
     fontSize: 20,
     fontWeight: "700",
-    color: "#FFFFFF",
+    color: "#303030",
   },
   planPrice: {
     fontSize: 18,
-    color: "#EAEAEA",
+    color: "#151515",
     marginTop: 8,
   },
   planSubtitle: {
