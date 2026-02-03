@@ -1,9 +1,9 @@
-export const COLORS = {
-  primary: '#4A90E2',      
-  secondary: '#50C878',    
-  accent: '#FF6B6B',       
-  background: '#F5F5F5',   
-  surface: '#FFFFFF',      
+export const LIGHT_THEME = {
+  primary: '#4A90E2',
+  secondary: '#50C878',
+  accent: '#FF6B6B',
+  background: '#F5F5F5',
+  surface: '#FFFFFF',
   text: {
     primary: '#2C3E50',
     secondary: '#7F8C8D',
@@ -14,6 +14,42 @@ export const COLORS = {
   warning: '#F39C12',
   success: '#27AE60',
 };
+
+export const DARK_THEME = {
+  primary: '#5DA9FF',
+  secondary: '#63D68F',
+  accent: '#FF6B6B',
+  background: '#0E0E10',
+  surface: '#1C1C1E',
+  text: {
+    primary: '#FFFFFF',
+    secondary: '#BFC4C8',
+    light: '#8F98A0',
+  },
+  border: '#2C2C2E',
+  error: '#FF6B6B',
+  warning: '#F39C12',
+  success: '#27AE60',
+};
+
+// Keep a mutable COLORS object for backwards compatibility with existing imports.
+export const COLORS: any = { ...LIGHT_THEME };
+
+export type ThemeName = 'light' | 'dark';
+
+export const THEMES = {
+  light: LIGHT_THEME,
+  dark: DARK_THEME,
+};
+
+export function setTheme(mode: ThemeName) {
+  const src = mode === 'dark' ? DARK_THEME : LIGHT_THEME;
+  Object.keys(src).forEach((key) => {
+    const k = key as keyof typeof src;
+    // @ts-ignore
+    COLORS[k] = (src as any)[k];
+  });
+}
 
 export const SPACING = {
   xs: 4,

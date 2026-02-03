@@ -1,19 +1,26 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Switch, Alert, ScrollView } from 'react-native';
 import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
 import { updateProfile } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../services/firebase/config';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme } from '../../contexts/ThemeContext';
 
 export default function UserSettingsScreen({ navigation }: any) {
-  const { signOut } = useAuth()
-  const user = auth.currentUser;
+  const { signOut, user } = useAuth();
+  const { theme, toggleTheme } = useTheme();
+  const firebaseUser = auth.currentUser;
+  const profileId = user?.id ?? firebaseUser?.uid;
   const [notifications, setNotifactions] = useState(false);
   const [displayName, setDisplayName] = useState(user?.displayName ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [loading, setLoading] = useState(false);
   const [weight, setWeight] = useState('');
+
+  const onToggleTheme = async (value: boolean) => {
+    await toggleTheme(value ? 'dark' : 'light');
+  }
 
   const handleSave = async () => {
     setLoading(true)
@@ -96,6 +103,12 @@ export default function UserSettingsScreen({ navigation }: any) {
         <Switch
           value={notifications}
           onValueChange={setNotifactions}
+        />
+
+        <Text style={styles.subtitle}>Dark mode</Text>
+        <Switch
+          value={theme === 'dark'}
+          onValueChange={onToggleTheme}
         />
 
         <TouchableOpacity
