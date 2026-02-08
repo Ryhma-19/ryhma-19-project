@@ -1,5 +1,9 @@
-import React from "react";
-import { View, Text, StyleSheet, TouchableOpacity, ScrollView, } from "react-native";
+import React, { useState } from "react";
+import { View, Text, StyleSheet, TouchableOpacity, ScrollView, FlatList, Alert } from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { StoreService, Pack } from "../../services/store/store.service";
+
+type TabType = 'premium' | 'training' | 'diet';
 
 type Plan = {
   id: string;
@@ -32,73 +36,215 @@ const FEATURES = [
 ];
 
 export default function PremiumPlanScreen() {
-  return (
-    <View style={styles.container}>
-      <ScrollView showsVerticalScrollIndicator={false}>
+  const [activeTab, setActiveTab] = useState<TabType>('premium');
 
-        <View style={styles.header}>
-          <Text style={styles.title}>Go Premium 💎</Text>
-          <Text style={styles.subtitle}>
-            Unlock your full fitness potential
-          </Text>
+  const trainingPacks = StoreService.getTrainingPacks();
+  const dietPacks = StoreService.getDietPacks();
+
+  const handlePurchase = (pack: Pack) => {
+    Alert.alert(
+      'Purchase',
+      `Purchase ${pack.title} for €${pack.price}?`,
+      [
+        {
+          text: 'Cancel',
+          onPress: () => {},
+          style: 'cancel',
+        },
+        {
+          text: 'Buy',
+          onPress: () => {
+            Alert.alert('Success', `You purchased ${pack.title}! 🎉`);
+          },
+        },
+      ]
+    );
+  };
+
+  const renderPackCard = ({ item }: { item: Pack }) => (
+    <View style={styles.packCard}>
+      <View style={styles.packHeader}>
+        <View style={styles.iconContainer}>
+          <Ionicons
+            name={activeTab === 'training' ? 'fitness' : 'restaurant'}
+            size={28}
+            color="#fff"
+          />
         </View>
-
-        <View style={styles.featuresContainer}>
-          {FEATURES.map((feature, index) => (
-            <View key={index} style={styles.featureItem}>
-              <Text style={styles.featureIcon}>✔</Text>
-              <Text style={styles.featureText}>{feature}</Text>
-            </View>
-          ))}
+        <View style={styles.packInfo}>
+          <Text style={styles.packTitle}>{item.title}</Text>
+          <Text style={styles.packDuration}>{item.duration}</Text>
         </View>
+      </View>
 
-        <View style={styles.plansContainer}>
-          {PLANS.map((plan) => (
-            <View
-              key={plan.id}
-              style={[
-                styles.planCard,
-                plan.highlighted && styles.highlightedPlan,
-              ]}
-            >
-              {plan.highlighted && (
-                <Text style={styles.badge}>BEST VALUE</Text>
-              )}
+      <Text style={styles.packDescription}>{item.description}</Text>
 
-              <Text style={styles.planTitle}>{plan.title}</Text>
-              <Text style={styles.planPrice}>{plan.price}</Text>
-
-              {plan.subtitle && (
-                <Text style={styles.planSubtitle}>{plan.subtitle}</Text>
-              )}
-
-              <TouchableOpacity
-                style={[
-                  styles.planButton,
-                  plan.highlighted && styles.highlightedButton,
-                ]}
-                onPress={() => {}}
-              >
-                <Text
-                  style={[
-                    styles.planButtonText,
-                    plan.highlighted && styles.highlightedButtonText,
-                  ]}
-                >
-                  Choose Plan
-                </Text>
-              </TouchableOpacity>
-            </View>
-          ))}
-        </View>
-
-        <Text style={styles.footerText}>
-          Cancel anytime • Billed through your app store
-        </Text>
-      </ScrollView>
+      <View style={styles.packFooter}>
+        <Text style={styles.packPrice}>€{item.price}</Text>
+        <TouchableOpacity
+          style={styles.buyButton}
+          onPress={() => handlePurchase(item)}
+        >
+          <Ionicons name="cart-outline" size={18} color="#fff" />
+          <Text style={styles.buyButtonText}>Buy</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
-};
+
+  const renderPremiumContent = () => (
+    <ScrollView showsVerticalScrollIndicator={false}>
+      <View style={styles.header}>
+        <Text style={styles.title}>Go Premium 💎</Text>
+        <Text style={styles.subtitle}>
+          Unlock your full fitness potential
+        </Text>
+      </View>
+
+      <View style={styles.featuresContainer}>
+        {FEATURES.map((feature, index) => (
+          <View key={index} style={styles.featureItem}>
+            <Text style={styles.featureIcon}>✔</Text>
+            <Text style={styles.featureText}>{feature}</Text>
+          </View>
+        ))}
+      </View>
+
+      <View style={styles.plansContainer}>
+        {PLANS.map((plan) => (
+          <View
+            key={plan.id}
+            style={[
+              styles.planCard,
+              plan.highlighted && styles.highlightedPlan,
+            ]}
+          >
+            {plan.highlighted && (
+              <Text style={styles.badge}>BEST VALUE</Text>
+            )}
+
+            <Text style={styles.planTitle}>{plan.title}</Text>
+            <Text style={styles.planPrice}>{plan.price}</Text>
+
+            {plan.subtitle && (
+              <Text style={styles.planSubtitle}>{plan.subtitle}</Text>
+            )}
+
+            <TouchableOpacity
+              style={[
+                styles.planButton,
+                plan.highlighted && styles.highlightedButton,
+              ]}
+              onPress={() => {}}
+            >
+              <Text
+                style={[
+                  styles.planButtonText,
+                  plan.highlighted && styles.highlightedButtonText,
+                ]}
+              >
+                Choose Plan
+              </Text>
+            </TouchableOpacity>
+          </View>
+        ))}
+      </View>
+
+      <Text style={styles.footerText}>
+        Cancel anytime • Billed through your app store
+      </Text>
+    </ScrollView>
+  );
+
+  const renderPacksContent = () => {
+    const currentPacks = activeTab === 'training' ? trainingPacks : dietPacks;
+    return (
+      <FlatList
+        data={currentPacks}
+        keyExtractor={(item) => item.id}
+        renderItem={renderPackCard}
+        contentContainerStyle={styles.listContainer}
+        scrollEnabled={true}
+      />
+    );
+  };
+
+  return (
+    <View style={styles.container}>
+      {/* Tab Navigation */}
+      <View style={styles.tabContainer}>
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'premium' && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab('premium')}
+        >
+          <Ionicons
+            name="diamond"
+            size={20}
+            color={activeTab === 'premium' ? '#fff' : '#888'}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'premium' && styles.activeTabText,
+            ]}
+          >
+            Premium
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'training' && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab('training')}
+        >
+          <Ionicons
+            name="fitness"
+            size={20}
+            color={activeTab === 'training' ? '#fff' : '#888'}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'training' && styles.activeTabText,
+            ]}
+          >
+            Training
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          style={[
+            styles.tab,
+            activeTab === 'diet' && styles.activeTab,
+          ]}
+          onPress={() => setActiveTab('diet')}
+        >
+          <Ionicons
+            name="restaurant"
+            size={20}
+            color={activeTab === 'diet' ? '#fff' : '#888'}
+          />
+          <Text
+            style={[
+              styles.tabText,
+              activeTab === 'diet' && styles.activeTabText,
+            ]}
+          >
+            Diet
+          </Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Content */}
+      {activeTab === 'premium' ? renderPremiumContent() : renderPacksContent()}
+    </View>
+  );
+}
 
 const styles = StyleSheet.create({
   container: {
@@ -204,5 +350,101 @@ const styles = StyleSheet.create({
     color: "#888",
     fontSize: 12,
     marginVertical: 24,
+  },
+  tabContainer: {
+    flexDirection: 'row',
+    backgroundColor: '#fff',
+    borderBottomWidth: 1,
+    borderBottomColor: '#e0e0e0',
+  },
+  tab: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 12,
+    gap: 8,
+  },
+  activeTab: {
+    backgroundColor: '#4CAF50',
+  },
+  tabText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#888',
+  },
+  activeTabText: {
+    color: '#fff',
+  },
+  listContainer: {
+    padding: 16,
+    paddingBottom: 20,
+  },
+  packCard: {
+    backgroundColor: '#fff',
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  packHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  iconContainer: {
+    width: 50,
+    height: 50,
+    borderRadius: 12,
+    backgroundColor: '#4CAF50',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
+  packInfo: {
+    flex: 1,
+  },
+  packTitle: {
+    fontSize: 16,
+    fontWeight: '700',
+    color: '#303030',
+    marginBottom: 4,
+  },
+  packDuration: {
+    fontSize: 13,
+    color: '#888',
+  },
+  packDescription: {
+    fontSize: 14,
+    color: '#555',
+    lineHeight: 20,
+    marginBottom: 12,
+  },
+  packFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  packPrice: {
+    fontSize: 18,
+    fontWeight: '800',
+    color: '#4CAF50',
+  },
+  buyButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 10,
+    gap: 6,
+  },
+  buyButtonText: {
+    color: '#fff',
+    fontWeight: '700',
+    fontSize: 14,
   },
 });
