@@ -55,4 +55,5 @@ export type MainTabParamList = {
   Track: undefined;
   Steps: undefined;
   Profile: undefined;
+  StorePage: undefined;
 };
