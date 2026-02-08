@@ -88,6 +88,7 @@ export class BadgeService {
 
       await setDoc(userBadgeRef, {
         badgeId,
+        progress: 10,
         milestones: badgeData.milestones ?? [],
         title: badgeData.title,
         type: badgeData.type,
@@ -104,6 +105,17 @@ export class BadgeService {
     try {
       if (!userId) {
         throw new Error("User ID is required");
+      }
+
+      const q = query(
+        collection(db, "users", userId, "badges"),
+        where("isProfile", "==", true)
+      );
+
+      const snap = await getDocs(q);
+
+      if (snap.docs.length >= 3) {
+        throw new Error("User can't have more than 3 badges displayed on profile");
       }
 
       const badgeRef = doc(db, "users", userId, "badges", badgeId);
