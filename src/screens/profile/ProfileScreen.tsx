@@ -49,7 +49,7 @@ export default function ProfileScreen({navigation}: any) {
       </View>
 
       <View style={styles.ProfileContainer}>
-        <Text style={styles.title}>{user?.displayName} 🎖️</Text>
+        <Text style={styles.title}>{user?.displayName}</Text>
         <Text style={styles.email}>{user?.email}</Text>
         <FlatList
           data={badges}

@@ -1,5 +1,5 @@
 import { View, Text, StyleSheet, Modal, Pressable } from "react-native"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Achievement, ICONS } from "../../../types"
 import { BadgeService } from "../../../services/badges/badge.service";
 import { useAuth } from "../../../contexts/AuthContext";
@@ -7,8 +7,36 @@ import { useAuth } from "../../../contexts/AuthContext";
 export default function BadgeCard({ badge }: { badge: Achievement }) {
   const { user } = useAuth()
   const [modalVisible, setModalVisible] = useState(false);
-  // const progressPercent = Math.min((badge.progress / badge.target) * 100, 100)
-  const progressPercent = 100
+  const [nextMilestone, setNextMilestone] = useState<number | null>(null);
+  const [progressPercent, setProgressPercent] = useState<number | null>(null);
+
+  useEffect(() => {
+  if (!badge.milestones?.length) {
+    setNextMilestone(null)
+    setProgressPercent(null)
+    return
+  }
+
+  const next = badge.milestones.find(
+    num => badge.progress < num
+  ) ?? null
+
+  setNextMilestone(next)
+
+  if (next === null || next === 0) {
+    setProgressPercent(null)
+    return
+  }
+
+  const percent = Math.min(
+    (badge.progress / next) * 100,
+    100
+  )
+
+  setProgressPercent(percent)
+}, [badge.progress, badge.milestones])
+
+  
 
   return (
     <View>
@@ -28,13 +56,16 @@ export default function BadgeCard({ badge }: { badge: Achievement }) {
             <Text style={styles.modalIcon}>{ICONS[badge.type] ?? ''}</Text>
           </View>
           <Text style={styles.modalText}>{badge.title}</Text>
-          {badge.progress && (
+          {badge.progress !== null && (
             <Text style={styles.modalText}>{badge.progress?.toString()}</Text>
           )}
-          {!badge.isUnlocked && (
+          {badge.isUnlocked && progressPercent !== null && progressPercent > 0 && (
             <View style={styles.modalProgressBar}>
-            <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
+              <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
             </View>
+          )}
+          {badge.isUnlocked && nextMilestone !== null && (
+            <Text style={styles.desc}>Next milestone: {nextMilestone}</Text>
           )}
           {!badge.isUnlocked && (
             <Pressable 
@@ -78,12 +109,6 @@ export default function BadgeCard({ badge }: { badge: Achievement }) {
           {badge.progress && (
             <Text>{badge.progress}</Text>
           )}
-
-          {!badge.isUnlocked && (
-            <View style={styles.progressBar}>
-              <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
-            </View>
-          )}
       
         </View>
       </Pressable>
@@ -116,8 +141,8 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   desc: {
-    fontSize: 12,
-    color: "#64748B",
+    fontSize: 16,
+    color: "#ffffff",
     textAlign: "center",
     marginVertical: 6,
   },
@@ -132,11 +157,6 @@ const styles = StyleSheet.create({
     height: "100%",
     backgroundColor: "#22C55E",
     borderRadius: 6,
-  },
-  isUnlocked: {
-    marginTop: 10,
-    fontWeight: "600",
-    color: "#16A34A",
   },
   background: {
     backgroundColor: '#ffffff',
