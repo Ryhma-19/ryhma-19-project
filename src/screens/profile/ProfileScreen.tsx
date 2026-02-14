@@ -14,18 +14,18 @@ export default function ProfileScreen({navigation}: any) {
     const [loading, setLoading] = useState(true)
   
   useEffect(() => {
-    const loadBadges = async () => {
-      if (!user?.id) {
-        setLoading(false)
-        return
-      }
-      const data = await BadgeService.getUserProfileBadges(user?.id)
+    if (!user?.id) return
+
+    const unsubscribe = BadgeService.getUserProfileBadges(
+    user.id,
+    (data) => {
       setBadges(data)
       setLoading(false)
     }
+  )
 
-    loadBadges()
-  }, [badges])
+  return () => unsubscribe()
+  }, [user?.id])
 
   if (loading) {
     return <ActivityIndicator style={{ marginTop: 40 }} />
@@ -36,11 +36,10 @@ export default function ProfileScreen({navigation}: any) {
       <View style={styles.topRightCorner}>
 
         <Pressable
-        style={styles.BadgesButton}
         onPress={() => navigation.navigate('UserBadges')}
         >
           <View>
-            <Text style={styles.buttonText}>My Badges</Text>
+            <Ionicons name="ribbon" size={32} />
           </View>
         </Pressable>
         <Pressable onPress={() => navigation.navigate('UserSettings')}>
@@ -51,12 +50,14 @@ export default function ProfileScreen({navigation}: any) {
       <View style={styles.ProfileContainer}>
         <Text style={styles.title}>{user?.displayName}</Text>
         <Text style={styles.email}>{user?.email}</Text>
-        <FlatList
+        <View style={styles.badgeSection}>
+          <FlatList
           data={badges}
           numColumns={3}
           keyExtractor={item => item.id}
-          renderItem={({ item }) => <BadgeCard badge={item} />}
+          renderItem={({ item }) => <BadgeCard badge={item} variant='profile' />}
         />
+        </View>
       </View>
     </View>
   );
@@ -66,6 +67,14 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: COLORS.background,
+  },
+  ProfileContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.sm,
+    margin: SPACING.sm,
+
   },
   title: {
     fontSize: TYPOGRAPHY.sizes.xl,
@@ -97,19 +106,18 @@ const styles = StyleSheet.create({
   topRightCorner: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    alignItems: 'center',
-    padding: 16,
-    gap: 8,
+    padding: SPACING.md,
+    gap: SPACING.sm,
   },
   BadgesButton: {
     backgroundColor: '#59b159',
     borderRadius: 16,
     padding: 8,
   },
-  ProfileContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: SPACING.lg,
-  }
+  badgeSection: {
+    width: '100%',
+    padding: SPACING.md,
+    backgroundColor: COLORS.surface,
+    borderRadius: 16,
+  },
 });
