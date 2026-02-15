@@ -1,19 +1,23 @@
 import React, { useState } from 'react';
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, Switch, Alert, ScrollView } from 'react-native';
-import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
+import { SPACING, TYPOGRAPHY, getColors } from '../../constants/theme';
 import { updateProfile } from 'firebase/auth';
 import { doc, updateDoc } from 'firebase/firestore';
 import { auth, db } from '../../services/firebase/config';
 import { useAuth } from '../../contexts/AuthContext';
+import { useTheme, ThemeType } from '../../contexts/ThemeContext';
 
 export default function UserSettingsScreen({ navigation }: any) {
   const { signOut } = useAuth()
+  const { theme, setTheme } = useTheme();
   const user = auth.currentUser;
   const [notifications, setNotifactions] = useState(false);
   const [displayName, setDisplayName] = useState(user?.displayName ?? '');
   const [email, setEmail] = useState(user?.email ?? '');
   const [loading, setLoading] = useState(false);
   const [weight, setWeight] = useState('');
+  const colors = getColors(theme);
+  const styles = createStyles(colors);
 
   const handleSave = async () => {
     setLoading(true)
@@ -98,6 +102,29 @@ export default function UserSettingsScreen({ navigation }: any) {
           onValueChange={setNotifactions}
         />
 
+        <Text style={styles.subtitle}>Choose Theme</Text>
+        <View style={styles.themeContainer}>
+          {(['normal', 'dark', 'light'] as ThemeType[]).map((themeOption) => (
+            <TouchableOpacity
+              key={themeOption}
+              style={[
+                styles.themeButton,
+                theme === themeOption && styles.themeButtonActive,
+              ]}
+              onPress={() => setTheme(themeOption)}
+            >
+              <Text
+                style={[
+                  styles.themeButtonText,
+                  theme === themeOption && styles.themeButtonTextActive,
+                ]}
+              >
+                {themeOption.charAt(0).toUpperCase() + themeOption.slice(1)}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+
         <TouchableOpacity
           style={styles.button}
           onPress={handleSave}
@@ -117,31 +144,32 @@ export default function UserSettingsScreen({ navigation }: any) {
 }
 
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getColors>) => StyleSheet.create({
   container: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
     padding: SPACING.lg,
     paddingBottom: 40,
   },
   subtitle: {
     fontSize: TYPOGRAPHY.sizes.lg,
-    color: COLORS.text.secondary,
+    color: colors.text.secondary,
     marginBottom: SPACING.xs,
   },
   input: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderWidth: 1,
     width: '100%',
-    borderColor: COLORS.border,
+    borderColor: colors.border,
     borderRadius: 8,
     padding: SPACING.md,
     marginBottom: SPACING.md,
     fontSize: TYPOGRAPHY.sizes.md,
+    color: colors.text.primary,
   },
   button: {
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
     borderRadius: 8,
     padding: SPACING.md,
     alignItems: 'center',
@@ -158,10 +186,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   signOutButton: {
-    backgroundColor: COLORS.error,
+    backgroundColor: colors.error,
     borderRadius: 8,
     padding: SPACING.md,
     alignItems: 'center',
     marginTop: 40,
+  },
+  themeContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
+    marginBottom: SPACING.lg,
+    gap: SPACING.sm,
+  },
+  themeButton: {
+    flex: 1,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.sm,
+    borderWidth: 2,
+    borderColor: colors.border,
+    borderRadius: 8,
+    alignItems: 'center',
+    backgroundColor: colors.surface,
+  },
+  themeButtonActive: {
+    borderColor: colors.primary,
+    backgroundColor: colors.primary,
+  },
+  themeButtonText: {
+    fontSize: TYPOGRAPHY.sizes.md,
+    color: colors.text.primary,
+    fontWeight: TYPOGRAPHY.weights.semibold,
+  },
+  themeButtonTextActive: {
+    color: '#FFFFFF',
   },
 });

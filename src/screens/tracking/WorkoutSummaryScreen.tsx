@@ -24,7 +24,8 @@ import {
   calculateElevationGain,
   suggestWorkoutName,
 } from '../../utils/workoutUtils';
-import { COLORS, SPACING, TYPOGRAPHY, BORDER_RADIUS } from '../../constants/theme';
+import { SPACING, TYPOGRAPHY, BORDER_RADIUS, getColors, COLORS } from '../../constants/theme';
+import { useTheme } from '../../contexts/ThemeContext';
 
 interface WorkoutSummaryScreenProps {
   navigation: any;
@@ -43,6 +44,9 @@ const FEELINGS: { value: FeelingType; label: string; icon: string; color: string
 
 export default function WorkoutSummaryScreen({ navigation, route }: WorkoutSummaryScreenProps) {
   const { user } = useAuth();
+  const { theme } = useTheme();
+  const colors = getColors(theme);
+  const styles = createStyles(colors);
   const { 
     workoutType,
     routeId,
@@ -169,7 +173,7 @@ export default function WorkoutSummaryScreen({ navigation, route }: WorkoutSumma
       >
         {/* Header */}
         <View style={styles.header}>
-          <Ionicons name="checkmark-circle" size={64} color={COLORS.success} />
+          <Ionicons name="checkmark-circle" size={64} color={colors.success} />
           <Text style={styles.headerTitle}>Workout Complete!</Text>
           <Text style={styles.headerSubtitle}>{suggestedName}</Text>
         </View>
@@ -178,7 +182,7 @@ export default function WorkoutSummaryScreen({ navigation, route }: WorkoutSumma
         <View style={styles.statsCard}>
           <View style={styles.statRow}>
             <View style={styles.statBox}>
-              <Ionicons name="time" size={24} color={COLORS.primary} />
+              <Ionicons name="time" size={24} color={colors.primary} />
               <Text style={styles.statValue}>{formatDuration(finalData.duration)}</Text>
               <Text style={styles.statLabel}>Duration</Text>
             </View>
@@ -186,7 +190,7 @@ export default function WorkoutSummaryScreen({ navigation, route }: WorkoutSumma
             <View style={styles.statDivider} />
 
             <View style={styles.statBox}>
-              <Ionicons name="trending-up" size={24} color={COLORS.primary} />
+              <Ionicons name="trending-up" size={24} color={colors.primary} />
               <Text style={styles.statValue}>{formatDistance(distance)}</Text>
               <Text style={styles.statLabel}>Distance</Text>
             </View>
@@ -194,7 +198,7 @@ export default function WorkoutSummaryScreen({ navigation, route }: WorkoutSumma
             <View style={styles.statDivider} />
 
             <View style={styles.statBox}>
-              <Ionicons name="speedometer" size={24} color={COLORS.primary} />
+              <Ionicons name="speedometer" size={24} color={colors.primary} />
               <Text style={styles.statValue}>{formatPace(averagePace)}</Text>
               <Text style={styles.statLabel}>Avg Pace</Text>
             </View>
@@ -263,7 +267,7 @@ export default function WorkoutSummaryScreen({ navigation, route }: WorkoutSumma
                 <Ionicons
                   name={feelingOption.icon as any}
                   size={28}
-                  color={feeling === feelingOption.value ? feelingOption.color : COLORS.text.secondary}
+                  color={feeling === feelingOption.value ? feelingOption.color : colors.text.secondary}
                 />
                 <Text
                   style={[
@@ -284,7 +288,7 @@ export default function WorkoutSummaryScreen({ navigation, route }: WorkoutSumma
           <TextInput
             style={styles.notesInput}
             placeholder="How was your workout? Any thoughts?"
-            placeholderTextColor={COLORS.text.light}
+            placeholderTextColor={colors.text.light}
             multiline
             numberOfLines={4}
             value={notes}
@@ -327,10 +331,10 @@ export default function WorkoutSummaryScreen({ navigation, route }: WorkoutSumma
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
   },
   scrollView: {
     flex: 1,
@@ -346,17 +350,17 @@ const styles = StyleSheet.create({
   headerTitle: {
     fontSize: TYPOGRAPHY.sizes.xxl,
     fontFamily: TYPOGRAPHY.fonts.bold,
-    color: COLORS.text.primary,
+    color: colors.text.primary,
     marginTop: SPACING.md,
   },
   headerSubtitle: {
     fontSize: TYPOGRAPHY.sizes.md,
     fontFamily: TYPOGRAPHY.fonts.regular,
-    color: COLORS.text.secondary,
+    color: colors.text.secondary,
     marginTop: SPACING.xs,
   },
   statsCard: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: SPACING.lg,
     padding: SPACING.lg,
     marginBottom: SPACING.lg,
@@ -376,22 +380,22 @@ const styles = StyleSheet.create({
   statValue: {
     fontSize: TYPOGRAPHY.sizes.xl,
     fontFamily: TYPOGRAPHY.fonts.bold,
-    color: COLORS.text.primary,
+    color: colors.text.primary,
     marginTop: SPACING.sm,
     marginBottom: SPACING.xs,
   },
   statLabel: {
     fontSize: TYPOGRAPHY.sizes.xs,
     fontFamily: TYPOGRAPHY.fonts.regular,
-    color: COLORS.text.secondary,
+    color: colors.text.secondary,
   },
   statDivider: {
     width: 1,
-    backgroundColor: COLORS.border,
+    backgroundColor: colors.border,
     marginHorizontal: SPACING.sm,
   },
   additionalStats: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: SPACING.md,
     padding: SPACING.md,
     marginBottom: SPACING.lg,
@@ -401,17 +405,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: SPACING.sm,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: colors.border,
   },
   additionalStatLabel: {
     fontSize: TYPOGRAPHY.sizes.sm,
     fontFamily: TYPOGRAPHY.fonts.regular,
-    color: COLORS.text.secondary,
+    color: colors.text.secondary,
   },
   additionalStatValue: {
     fontSize: TYPOGRAPHY.sizes.sm,
     fontFamily: TYPOGRAPHY.fonts.semiBold,
-    color: COLORS.text.primary,
+    color: colors.text.primary,
   },
   section: {
     marginBottom: SPACING.lg,
@@ -419,11 +423,11 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: TYPOGRAPHY.sizes.md,
     fontFamily: TYPOGRAPHY.fonts.semiBold,
-    color: COLORS.text.primary,
+    color: colors.text.primary,
     marginBottom: SPACING.md,
   },
   splitsContainer: {
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: SPACING.md,
     overflow: 'hidden',
   },
@@ -432,17 +436,17 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     padding: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: COLORS.border,
+    borderBottomColor: colors.border,
   },
   splitKm: {
     fontSize: TYPOGRAPHY.sizes.md,
     fontFamily: TYPOGRAPHY.fonts.medium,
-    color: COLORS.text.primary,
+    color: colors.text.primary,
   },
   splitPace: {
     fontSize: TYPOGRAPHY.sizes.md,
     fontFamily: TYPOGRAPHY.fonts.semiBold,
-    color: COLORS.primary,
+    color: colors.primary,
   },
   feelingsRow: {
     flexDirection: 'row',
@@ -453,7 +457,7 @@ const styles = StyleSheet.create({
     flex: 1,
     alignItems: 'center',
     padding: SPACING.sm,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: SPACING.md,
     borderWidth: 2,
     borderColor: 'transparent',

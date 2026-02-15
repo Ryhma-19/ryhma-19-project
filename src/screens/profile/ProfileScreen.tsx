@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { View, Text, StyleSheet, Pressable, FlatList, ActivityIndicator, Image } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
-import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
+import { useTheme } from '../../contexts/ThemeContext';
+import { SPACING, TYPOGRAPHY, getColors } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
 import BadgeCard from './badges/BadgeCard';
 import { Achievement } from '../../types';
@@ -10,8 +11,11 @@ import { BadgeService } from '../../services/badges/badge.service';
 
 export default function ProfileScreen({navigation}: any) {
   const { user } = useAuth();
-    const [badges, setBadges] = useState<Achievement[]>()
-    const [loading, setLoading] = useState(true)
+  const { theme } = useTheme();
+  const colors = getColors(theme);
+  const styles = createStyles(colors);
+  const [badges, setBadges] = useState<Achievement[]>()
+  const [loading, setLoading] = useState(true)
   
   useEffect(() => {
     if (!user?.id) return
@@ -67,10 +71,18 @@ export default function ProfileScreen({navigation}: any) {
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.background,
+    backgroundColor: colors.background,
+  },
+  ProfileContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: SPACING.sm,
+    margin: SPACING.sm,
+
   },
   ProfileContainer: {
     flex: 1,
@@ -83,21 +95,21 @@ const styles = StyleSheet.create({
   title: {
     fontSize: TYPOGRAPHY.sizes.xl,
     fontWeight: TYPOGRAPHY.weights.bold,
-    color: COLORS.text.primary,
+    color: colors.text.primary,
     marginBottom: SPACING.sm,
   },
   subtitle: {
     fontSize: TYPOGRAPHY.sizes.lg,
-    color: COLORS.text.secondary,
+    color: colors.text.secondary,
     marginBottom: SPACING.xs,
   },
   email: {
     fontSize: TYPOGRAPHY.sizes.sm,
-    color: COLORS.text.light,
+    color: colors.text.light,
     marginBottom: SPACING.xl,
   },
   button: {
-    backgroundColor: COLORS.error,
+    backgroundColor: colors.error,
     borderRadius: 8,
     padding: SPACING.md,
     paddingHorizontal: SPACING.xl,
@@ -122,7 +134,7 @@ const styles = StyleSheet.create({
     width: '100%',
     height: 150,
     padding: SPACING.md,
-    backgroundColor: COLORS.surface,
+    backgroundColor: colors.surface,
     borderRadius: 16,
   },
   avatar: {
