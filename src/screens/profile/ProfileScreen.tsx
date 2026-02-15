@@ -84,14 +84,6 @@ const createStyles = (colors: ReturnType<typeof getColors>) => StyleSheet.create
     margin: SPACING.sm,
 
   },
-  ProfileContainer: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: SPACING.sm,
-    margin: SPACING.sm,
-
-  },
   title: {
     fontSize: TYPOGRAPHY.sizes.xl,
     fontWeight: TYPOGRAPHY.weights.bold,
