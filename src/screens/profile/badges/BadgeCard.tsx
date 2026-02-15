@@ -1,14 +1,51 @@
 import { View, Text, StyleSheet, Modal, Pressable } from "react-native"
-import { useEffect, useState } from "react";
+import { useEffect, useState, useMemo } from "react";
 import { Achievement, ICONS } from "../../../types"
 import { BadgeService } from "../../../services/badges/badge.service";
 import { useAuth } from "../../../contexts/AuthContext";
 
-export default function BadgeCard({ badge }: { badge: Achievement }) {
+const badge_rarity = {
+  noRarity: {
+    color: "#fff"
+  },
+  bronze: {
+    color: "#CE8946"
+  },
+  silver: {
+    color: "#C4C4C4"
+  },
+  gold: {
+    color: "#EFBF04"
+  },
+  platinum: {
+    color: "#4c6ba5"
+  }
+}
+
+type rarityKey = keyof typeof badge_rarity;
+
+export default function BadgeCard({ badge, variant = 'collection' }: { badge: Achievement, variant?: 'collection' | 'profile' }) {
   const { user } = useAuth()
   const [modalVisible, setModalVisible] = useState(false);
   const [nextMilestone, setNextMilestone] = useState<number | null>(null);
   const [progressPercent, setProgressPercent] = useState<number | null>(null);
+
+  const rarity: rarityKey = useMemo(() => {
+    if (!badge.milestones) {
+      return "noRarity"
+    }
+
+    const index = badge.milestones
+    .map((value, index) => (badge.progress >= value ? index : -1))
+    .filter(index => index !== -1)
+    .pop()
+
+    if (index === undefined || 0) return 'noRarity'
+    if (index <= 1) return 'bronze'
+    if (index === 2) return 'silver'
+    if (index === 3) return 'gold'
+    return 'platinum'
+  }, [badge.progress, badge.milestones])
 
   useEffect(() => {
   if (!badge.milestones?.length) {
@@ -17,9 +54,7 @@ export default function BadgeCard({ badge }: { badge: Achievement }) {
     return
   }
 
-  const next = badge.milestones.find(
-    num => badge.progress < num
-  ) ?? null
+  const next = badge.milestones.find(num => badge.progress < num) ?? null
 
   setNextMilestone(next)
 
@@ -28,15 +63,14 @@ export default function BadgeCard({ badge }: { badge: Achievement }) {
     return
   }
 
-  const percent = Math.min(
-    (badge.progress / next) * 100,
-    100
-  )
+  const percent = Math.min((badge.progress / next) * 100, 100)
 
   setProgressPercent(percent)
 }, [badge.progress, badge.milestones])
 
-  
+  const handleModalVisibility = () => {
+    setModalVisible(!modalVisible)
+  }
 
   return (
     <View>
@@ -45,66 +79,65 @@ export default function BadgeCard({ badge }: { badge: Achievement }) {
           transparent={true}
           visible={modalVisible}
           onRequestClose={() => {
-            setModalVisible(!modalVisible);
+            setModalVisible(false);
         }}>
         <Pressable 
           style={styles.modalOverlay}
           onPress={() => setModalVisible(false)}
         >
-
-          <View style={[styles.modalScreen, !badge.isUnlocked && styles.locked]}>
+        <View style={styles.modalCard}>
+          <View style={[styles.modalScreen, {backgroundColor: badge_rarity[rarity].color}, !badge.isUnlocked && styles.locked]}>
             <Text style={styles.modalIcon}>{ICONS[badge.type] ?? ''}</Text>
           </View>
-          <Text style={styles.modalText}>{badge.title}</Text>
-          {badge.progress !== null && (
-            <Text style={styles.modalText}>{badge.progress?.toString()}</Text>
+
+          <Text style={styles.modalTitle}>{badge.title}</Text>
+
+          {badge.isUnlocked && badge.progress && (
+            <Text style={styles.modalProgress}>{badge.progress}</Text>
           )}
-          {badge.isUnlocked && progressPercent !== null && progressPercent > 0 && (
-            <View style={styles.modalProgressBar}>
+
+          {badge.isUnlocked && progressPercent && progressPercent > 0 && (
+            <View style={styles.progressBar}>
               <View style={[styles.progressFill, { width: `${progressPercent}%` }]} />
             </View>
           )}
-          {badge.isUnlocked && nextMilestone !== null && (
+
+          {badge.isUnlocked && nextMilestone && (
             <Text style={styles.desc}>Next milestone: {nextMilestone}</Text>
           )}
+
           {!badge.isUnlocked && (
             <Pressable 
-            style={styles.modalIconButton}
+            style={styles.modalButton}
             onPress={() => BadgeService.saveBadgeToUser(user?.id, badge.id)}
             >
-              <Text>Unlock</Text>
+              <Text style={styles.modalButtonText}>Unlock</Text>
             </Pressable>
           )}
 
-          {badge.isUnlocked && !badge.isProfile && (
-            <Pressable 
-            style={styles.modalIconButton}
-            onPress={() => BadgeService.changeProfileBadgeStatus(user?.id, badge.id, true)}
+          {badge.isUnlocked && (
+            <Pressable
+              style={styles.modalButton}
+              onPress={() => BadgeService.changeProfileBadgeStatus(user?.id, badge.id, !badge.isProfile)}
             >
-            <Text>Add to profile</Text>
-            </Pressable> 
-          )}
-
-          {badge.isUnlocked && badge.isProfile && (
-            <Pressable 
-            style={styles.modalIconButton}
-            onPress={() => BadgeService.changeProfileBadgeStatus(user?.id, badge.id, false)}
-            >
-            <Text>Remove from profile</Text>
+            <Text style={styles.modalButtonText}>
+            {badge.isProfile ? 'Remove from profile' : 'Add to profile'}
+            </Text>
             </Pressable>
-          )}
+            )}
+          </View>
         </Pressable>
       </Modal>
 
       <Pressable
-      onPress={() => setModalVisible(true)}
+      onPress={() => handleModalVisibility()}
       >
         <View style={[styles.card, !badge.isUnlocked && styles.locked]}>
-          <View style={styles.background}>
+          <View style={[styles.background, {backgroundColor: badge_rarity[rarity].color}]}>
             <Text style={styles.icon}>{ICONS[badge.type] ?? ''}</Text>
           </View>
 
-          <Text style={styles.badgeTitle}>{badge.title}</Text>
+          <Text style={styles.badgeTitle} numberOfLines={2}>{badge.title}</Text>
 
           {badge.progress && (
             <Text>{badge.progress}</Text>
@@ -121,12 +154,7 @@ const styles = StyleSheet.create({
     
   card: {
     width: 100,
-    padding: 16,
-    borderRadius: 32,
     alignItems: "center",
-    shadowColor: "#000",
-    shadowOpacity: 0.05,
-    shadowRadius: 60,
   },
   locked: {
     opacity: 0.5,
@@ -146,60 +174,76 @@ const styles = StyleSheet.create({
     textAlign: "center",
     marginVertical: 6,
   },
-  progressBar: {
-    width: "100%",
-    height: 6,
-    backgroundColor: "#E2E8F0",
-    borderRadius: 6,
-    marginTop: 10,
-  },
-  progressFill: {
-    height: "100%",
-    backgroundColor: "#22C55E",
-    borderRadius: 6,
-  },
   background: {
-    backgroundColor: '#ffffff',
+    backgroundColor: '#fcfcfc',
     borderRadius: 40,
     padding: 4,
+    marginTop: 10,
     width: 68,
     alignItems: 'center',
+    shadowColor: '#2e2f00',
+    shadowOpacity: 0.6,
+    shadowRadius: 12,
+    elevation: 6,
   },
   modalOverlay: {
     flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.6)",
+    backgroundColor: "rgba(0, 0, 0, 0.81)",
     justifyContent: "center",
     alignItems: "center",
   },
   modalScreen: {
     height: '25%',
     width: '50%',
-    backgroundColor: '#ffff',
+    backgroundColor: '#a5ffef',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 100,
     marginBottom: 16,
   },
-  modalText: {
-    fontSize: 16,
+  modalCard: {
+    width: '80%',
+    height: '75%',
+    padding: 24,
+    borderRadius: 24,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  modalTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#F8FAFC',
+    textAlign: 'center',
+  },
+  modalProgress: {
+    fontSize: 32,
     fontWeight: "600",
     color: '#ffff',
   },
   modalIcon: {
-    fontSize: 100,
+    fontSize: 80,
   },
-  modalProgressBar: {
-    width: "50%",
-    height: 6,
+  progressBar: {
+    width: "85%",
+    height: 10,
     backgroundColor: "#E2E8F0",
     borderRadius: 6,
-    marginTop: 10,
+    marginTop: 15,
+    marginBottom: 2,
   },
-  modalIconButton: {
-    marginTop: 24,
-    borderRadius: 8,
-    padding: 24,
-    alignItems: 'center',
-    backgroundColor: '#1bff2e',
+    progressFill: {
+    height: "100%",
+    backgroundColor: "#22C55E",
+    borderRadius: 6,
+  },
+  modalButton: {
+    marginTop: 20,
+    backgroundColor: '#22C55E',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+  },
+  modalButtonText: {
+    fontWeight: 700,
   }
 })

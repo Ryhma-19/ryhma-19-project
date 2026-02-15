@@ -13,18 +13,25 @@ export default function BadgeScreen() {
   const [loading, setLoading] = useState(true)
 
   useEffect(() => {
+    if (!user?.id) return
+
+    let unsubscribe: any
+
     const loadBadges = async () => {
-      if (!user?.id) {
-        setLoading(false)
-        return
-      }
-      const data = await BadgeService.getAllBadges(user?.id)
-      setBadges(data)
+      unsubscribe = await BadgeService.getAllBadges(
+        user.id,
+        (data) => {
+          setBadges(data)
+          setLoading(false)
+        }
+      )
       setLoading(false)
     }
 
     loadBadges()
-  }, [badges])
+
+    return () => unsubscribe?.()
+  }, [user?.id])
 
   const sortedBadges = useMemo(() => {
     return [...badges].sort((a, b) => {
