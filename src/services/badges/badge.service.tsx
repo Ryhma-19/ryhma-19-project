@@ -1,6 +1,6 @@
 import { doc, getDocs, collection, Timestamp, setDoc, updateDoc, getDoc, query, where, onSnapshot } from "firebase/firestore";
 import { db } from "../firebase/config";
-import { Achievement, WorkoutStats, BadgeType } from "../../types";
+import { Achievement, BadgeType, AchievementStats } from "../../types";
 
 
 export class BadgeService {
@@ -127,8 +127,61 @@ export class BadgeService {
     }
   }
 
-  static async checkForNewBadgeUnlocks(userId: number, stats: WorkoutStats) {
+  static async checkForNewBadgeUnlocks(userId: string | undefined, stats: AchievementStats) {
+    try {
+      if (!userId) {
+        throw new Error("user id is missing");
+      }
+      
+      const badgesSnap = await getDocs(collection(db, "badges"))
 
+      const statMap: Record<string, number> = {
+        amount: stats.amount,
+        distance: stats.distance,
+        steps: stats.steps,
+        duration: stats.duration,
+        average_pace: stats.averagePace,
+        longest_run: stats.longestRun,
+        streak: stats.currentStreak,
+        longest_streak: stats.longestStreak,
+      }
+
+      for (const badgeDoc of badgesSnap.docs) {
+        const badgeId = badgeDoc.id
+        const badgeData = badgeDoc.data()
+        const type = badgeData.type as string
+
+        const progress = statMap[type] ?? 0
+
+        if (progress <= 0) continue
+
+        const userBadgeRef = doc(db, "users", userId, "badges", badgeId)
+
+        const existing = await getDoc(userBadgeRef)
+
+        if (existing.exists()) {
+          // Update progress if it's already unlocked
+          await setDoc(
+            userBadgeRef,
+            {
+              progress,
+            },
+            { merge: true }
+          )
+        } else {
+          // Unlock new badge
+          await setDoc(userBadgeRef, {
+            ...badgeData,
+            progress,
+            unlockedAt: new Date(),
+            isProfile: false,
+          })
+        }
+      }
+    } catch (error) {
+      console.error("Error checking badges:", error)
+      throw error
+    }
   }
 
   static async changeProfileBadgeStatus(userId: string | undefined, badgeId: string, status: boolean) {
