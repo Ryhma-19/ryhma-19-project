@@ -3,12 +3,17 @@ import React, { useEffect, useMemo, useState } from "react"
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from "react-native"
 import { Achievement } from "../../../types"
 import { useAuth } from "../../../contexts/AuthContext"
+import { useTheme } from "../../../contexts/ThemeContext"
+import { SPACING, TYPOGRAPHY, getColors } from "../../../constants/theme"
 import BadgeCard from "./BadgeCard"
 import { BadgeService } from "../../../services/badges/badge.service"
 
 
 export default function BadgeScreen() {
   const { user } = useAuth()
+  const { theme } = useTheme()
+  const colors = getColors(theme)
+  const styles = createStyles(colors)
   const [badges, setBadges] = useState<Achievement[]>([])
   const [loading, setLoading] = useState(true)
 
@@ -59,15 +64,16 @@ export default function BadgeScreen() {
   )
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getColors>) => StyleSheet.create({
   container: {
     flex: 1,
     padding: 16,
-    backgroundColor: "#F8FAFC",
+    backgroundColor: colors.background,
   },
   title: {
     fontSize: 24,
     fontWeight: "700",
     marginBottom: 16,
+    color: colors.text.primary,
   },
 })

@@ -10,8 +10,9 @@ import {
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useWorkoutTracking } from '../../hooks/useWorkoutTracking';
+import { useTheme } from '../../contexts/ThemeContext';
 import { formatDuration, formatDistance, formatPace } from '../../utils/workoutUtils';
-import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
+import { SPACING, TYPOGRAPHY, getColors } from '../../constants/theme';
 import { WorkoutType } from '../../types/workout';
 
 interface ActiveWorkoutScreenProps {
@@ -20,6 +21,9 @@ interface ActiveWorkoutScreenProps {
 }
 
 export default function ActiveWorkoutScreen({ navigation, route }: ActiveWorkoutScreenProps) {
+  const { theme } = useTheme();
+  const colors = getColors(theme);
+  const styles = createStyles(colors);
   const { 
     workoutType, 
     routeId, 
@@ -250,7 +254,7 @@ export default function ActiveWorkoutScreen({ navigation, route }: ActiveWorkout
           onPress={handleFinishWorkout}
           activeOpacity={0.8}
         >
-          <Ionicons name="checkmark-circle" size={24} color={COLORS.primary} />
+          <Ionicons name="checkmark-circle" size={24} color={colors.primary} />
           <Text style={styles.finishButtonText}>Finish Workout</Text>
         </TouchableOpacity>
       </View>
@@ -266,16 +270,16 @@ export default function ActiveWorkoutScreen({ navigation, route }: ActiveWorkout
   );
 }
 
-const styles = StyleSheet.create({
+const createStyles = (colors: ReturnType<typeof getColors>) => StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: COLORS.primary,
+    backgroundColor: colors.primary,
   },
   loadingText: {
     fontSize: TYPOGRAPHY.sizes.lg,
@@ -403,7 +407,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0, 0, 0, 0.3)',
   },
   resumeButton: {
-    backgroundColor: COLORS.success,
+    backgroundColor: colors.success,
   },
   mainButtonText: {
     fontSize: TYPOGRAPHY.sizes.xl,
@@ -421,7 +425,7 @@ const styles = StyleSheet.create({
   },
   finishButtonText: {
     fontSize: TYPOGRAPHY.sizes.md,
-    color: COLORS.primary,
+    color: colors.primary,
     fontFamily: TYPOGRAPHY.fonts.semiBold,
   },
   gpsIndicator: {
@@ -438,7 +442,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(255, 255, 255, 0.3)',
   },
   gpsActive: {
-    backgroundColor: COLORS.success,
+    backgroundColor: colors.success,
   },
   gpsText: {
     fontSize: TYPOGRAPHY.sizes.xs,
