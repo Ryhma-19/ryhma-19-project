@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, StyleSheet, Pressable, FlatList, ActivityIndicator } from 'react-native';
+import { View, Text, StyleSheet, Pressable, FlatList, ActivityIndicator, Image } from 'react-native';
 import { useAuth } from '../../contexts/AuthContext';
 import { COLORS, SPACING, TYPOGRAPHY } from '../../constants/theme';
 import { Ionicons } from '@expo/vector-icons';
@@ -48,6 +48,10 @@ export default function ProfileScreen({navigation}: any) {
       </View>
 
       <View style={styles.ProfileContainer}>
+        <Image
+          source={require("../../images/user_icon.png")}
+          style={styles.avatar}
+        />
         <Text style={styles.title}>{user?.displayName}</Text>
         <Text style={styles.email}>{user?.email}</Text>
         <View style={styles.badgeSection}>
@@ -116,8 +120,14 @@ const styles = StyleSheet.create({
   },
   badgeSection: {
     width: '100%',
+    height: 150,
     padding: SPACING.md,
     backgroundColor: COLORS.surface,
     borderRadius: 16,
   },
+  avatar: {
+    width: 96,
+    height: 96,
+    marginBottom: SPACING.md,
+  }
 });
